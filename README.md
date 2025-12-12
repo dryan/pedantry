@@ -46,7 +46,66 @@ Opinionated linting and formatting configurations for TypeScript, JavaScript, CS
 
 ## Installation
 
-### 1. Copy Configuration Files
+### Method 1: Git Submodule (Recommended)
+
+Add pedantry as a submodule to stay in sync with updates:
+
+**1. Add the submodule:**
+
+```bash
+cd your-project
+git submodule add https://github.com/yourusername/pedantry.git .pedantry
+```
+
+**2. Run the setup script:**
+
+```bash
+# For hybrid Python + TypeScript/JavaScript projects
+.pedantry/setup-pedantry.sh --type hybrid
+
+# For Python-only projects
+.pedantry/setup-pedantry.sh --type python
+
+# For TypeScript/JavaScript-only projects
+.pedantry/setup-pedantry.sh --type typescript
+```
+
+The script creates symlinks to all necessary config files.
+
+**3. Merge dependencies:**
+
+Merge `devDependencies` from `.pedantry/package.json` into your `package.json`, then:
+
+```bash
+npm install      # Install JavaScript dependencies
+uv sync          # Install Python dependencies (if Python project)
+lefthook install # Set up git hooks
+```
+
+**4. Commit the setup:**
+
+```bash
+git add .gitmodules .pedantry <symlinked-files>
+git commit -m "➕ Add pedantry config submodule"
+```
+
+**Updating pedantry:**
+
+```bash
+git submodule update --remote .pedantry
+git add .pedantry
+git commit -m "⬆️ Update pedantry configs"
+```
+
+**Cloning projects with the submodule:**
+
+```bash
+git clone --recurse-submodules <your-repo-url>
+# or if already cloned:
+git submodule update --init --recursive
+```
+
+### Method 2: Copy Files Directly
 
 Copy the configuration files you need to your project:
 
@@ -61,7 +120,7 @@ cp stylelint.config.mjs <your-project>/
 cp pyproject.toml <your-project>/
 
 # Build tools (if needed)
-cp rollup.config.js web-test-runner.config.js custom-elements-manifest.config.js <your-project>/
+cp rollup.config.js vitest.config.ts web-test-runner.config.js custom-elements-manifest.config.js <your-project>/
 
 # VS Code settings
 cp -r .vscode <your-project>/
@@ -70,12 +129,12 @@ cp -r .vscode <your-project>/
 cp -r .github <your-project>/
 ```
 
-### 2. Install Dependencies
-
-**Node.js dependencies:**
+Then install dependencies:
 
 ```bash
-npm install
+npm install      # Install JavaScript dependencies
+uv sync          # Install Python dependencies (if Python project)
+lefthook install # Set up git hooks
 ```
 
 **Python dependencies (if using Python):**
@@ -93,19 +152,7 @@ pipx install ty
 pip install ruff pytest
 ```
 
-### 3. Set Up Git Hooks
-
-```bash
-# Install lefthook globally (once)
-npm install -g lefthook
-
-# Install hooks in your project
-lefthook install
-```
-
-The hooks will automatically run on commit via the `postinstall` script.
-
-### 4. Customize for Your Project
+## Customization
 
 **Update `package.json`:**
 
