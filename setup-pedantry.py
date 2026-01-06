@@ -4,6 +4,7 @@
 import shutil
 from pathlib import Path
 from typing import Annotated
+from urllib.request import urlopen
 
 import typer
 
@@ -38,6 +39,68 @@ def copy_file(source: Path, target: Path) -> None:
 def has_type(project_types: list[str], type_name: str) -> bool:
     """Check if a project type is enabled."""
     return type_name in project_types
+
+
+def download_gitignore_template(template_name: str) -> str:
+    """Download a .gitignore template from GitHub."""
+    url = f"https://raw.githubusercontent.com/github/gitignore/main/{template_name}.gitignore"
+    try:
+        with urlopen(url) as response:
+            return response.read().decode("utf-8")
+    except Exception as e:
+        typer.secho(
+            f"Warning: Could not download {template_name}.gitignore: {e}",
+            fg=typer.colors.YELLOW,
+            err=True,
+        )
+        return ""
+
+
+def generate_gitignore(project_types: list[str]) -> None:
+    """Generate .gitignore file based on project types."""
+    gitignore_path = Path(".gitignore")
+
+    if gitignore_path.exists():
+        typer.secho("  Skipping .gitignore (already exists)", fg=typer.colors.YELLOW)
+        return
+
+    typer.echo("Generating .gitignore...")
+
+    templates = []
+
+    # Python projects (includes Django)
+    if has_type(project_types, "python") or has_type(project_types, "django"):
+        templates.append("Python")
+
+    # TypeScript/JavaScript projects
+    if (
+        has_type(project_types, "typescript")
+        or has_type(project_types, "javascript")
+        or has_type(project_types, "css")
+    ):
+        templates.append("Node")
+
+    if not templates:
+        typer.secho(
+            "  No .gitignore templates needed for selected types",
+            fg=typer.colors.YELLOW,
+        )
+        return
+
+    content_parts = []
+    for template in templates:
+        template_content = download_gitignore_template(template)
+        if template_content:
+            content_parts.append(f"### {template} ###\n{template_content}")
+
+    if content_parts:
+        final_content = "\n\n".join(content_parts)
+        gitignore_path.write_text(final_content)
+        typer.secho("  ✓ Generated .gitignore", fg=typer.colors.GREEN)
+    else:
+        typer.secho(
+            "  Warning: Could not generate .gitignore", fg=typer.colors.YELLOW, err=True
+        )
 
 
 def generate_lefthook(project_types: list[str]) -> None:
@@ -191,6 +254,7 @@ def main(
     create_symlink(pedantry_path / ".editorconfig", Path(".editorconfig"))
     create_symlink(pedantry_path / ".prettierrc.json5", Path(".prettierrc.json5"))
     create_symlink(pedantry_path / ".prettierignore", Path(".prettierignore"))
+    generate_gitignore(project_types)
     generate_lefthook(project_types)
 
     # VS Code settings
