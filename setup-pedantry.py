@@ -116,7 +116,10 @@ def generate_lefthook(project_types: list[str]) -> None:
     content += """    # Format files
     prettier:
       glob: "*.{js,ts,json,css,html,md,yml,yaml}"
-      run: for f in {staged_files}; do [ ! -L "$f" ] && npx prettier --write "$f"; done || true
+      run: |
+        for f in {staged_files}; do
+          [ ! -L "$f" ] && npx prettier --write "$f"
+        done || true
       stage_fixed: true
 
 """
@@ -204,11 +207,14 @@ def main(
 
     Examples:
 
-        uv run --isolated --with typer .pedantry/setup-pedantry.py --type python
+        uv run --isolated --with typer .pedantry/setup-pedantry.py \
+            --type python
 
-        uv run --isolated --with typer .pedantry/setup-pedantry.py --type typescript --type css
+        uv run --isolated --with typer .pedantry/setup-pedantry.py \
+            --type typescript --type css
 
-        uv run --isolated --with typer .pedantry/setup-pedantry.py --type python --type django
+        uv run --isolated --with typer .pedantry/setup-pedantry.py \
+            --type python --type django
     """
     # Validate types
     valid_types = {"python", "typescript", "javascript", "css", "django"}
@@ -240,7 +246,8 @@ def main(
         )
         typer.echo("Have you added the submodule? Run:")
         typer.echo(
-            f"  git submodule add https://github.com/yourusername/pedantry.git {pedantry_path}"
+            f"  git submodule add "
+            f"https://github.com/yourusername/pedantry.git {pedantry_path}"
         )
         raise typer.Exit(1)
 
@@ -327,7 +334,8 @@ def main(
         or has_type(project_types, "django")
     ):
         typer.echo(
-            f"1. Merge devDependencies from {pedantry_path}/package.json into your package.json"
+            f"1. Merge devDependencies from {pedantry_path}/package.json "
+            f"into your package.json"
         )
         typer.echo("2. Run: npm install")
 
