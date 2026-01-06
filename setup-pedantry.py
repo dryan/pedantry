@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Set up pedantry configs in your project via symlinks."""
 
+import json
+import re
 import shutil
 from pathlib import Path
 from typing import Annotated
@@ -34,6 +36,67 @@ def copy_file(source: Path, target: Path) -> None:
     else:
         shutil.copy2(source, target)
         typer.secho(f"  ✓ Copied {target}", fg=typer.colors.GREEN)
+
+
+def copy_pyproject_with_project_name(source: Path, target: Path) -> None:
+    """Copy pyproject.toml and set project name from the current directory."""
+    if target.exists():
+        typer.secho(f"  Skipping {target} (already exists)", fg=typer.colors.YELLOW)
+        return
+
+    if not source.exists():
+        typer.secho(
+            f"  Warning: Template pyproject.toml not found at {source}",
+            fg=typer.colors.YELLOW,
+            err=True,
+        )
+        return
+
+    project_name = Path.cwd().name
+    content = source.read_text()
+
+    pattern = re.compile(r"(\[project\][^\[]*?name\s*=\s*\")([^\"]+)(\")", re.DOTALL)
+    match = pattern.search(content)
+    if match:
+        updated_content = (
+            content[: match.start(2)] + project_name + content[match.end(2) :]
+        )
+    else:
+        # Fallback to replacing the first occurrence of the name assignment.
+        updated_content = content.replace(
+            'name = "pedantry"', f'name = "{project_name}"', 1
+        )
+
+    target.write_text(updated_content)
+    typer.secho(
+        f"  ✓ Copied {target} (project name set to {project_name})",
+        fg=typer.colors.GREEN,
+    )
+
+
+def get_dev_dependencies(pedantry_path: Path) -> list[str]:
+    """Return sorted dev dependency names from the pedantry package.json."""
+    package_path = pedantry_path / "package.json"
+    if not package_path.exists():
+        typer.secho(
+            f"Warning: {package_path} not found; cannot suggest npm install command",
+            fg=typer.colors.YELLOW,
+            err=True,
+        )
+        return []
+
+    try:
+        package_data = json.loads(package_path.read_text())
+    except json.JSONDecodeError as exc:
+        typer.secho(
+            f"Warning: Could not parse {package_path}: {exc}",
+            fg=typer.colors.YELLOW,
+            err=True,
+        )
+        return []
+
+    dev_deps = package_data.get("devDependencies", {})
+    return sorted(dev_deps.keys())
 
 
 def has_type(project_types: list[str], type_name: str) -> bool:
@@ -308,7 +371,9 @@ def main(
 
     if has_type(project_types, "python") or has_type(project_types, "django"):
         typer.echo("\nSetting up Python configs...")
-        create_symlink(pedantry_path / "pyproject.toml", Path("pyproject.toml"))
+        copy_pyproject_with_project_name(
+            pedantry_path / "pyproject.toml", Path("pyproject.toml")
+        )
 
     if has_type(project_types, "django"):
         typer.echo("\nSetting up Django configs...")
@@ -327,23 +392,33 @@ def main(
     # Next steps
     typer.secho("Next steps:", fg=typer.colors.YELLOW)
 
-    if (
+    step_number = 1
+    has_frontend_stack = (
         has_type(project_types, "typescript")
         or has_type(project_types, "javascript")
         or has_type(project_types, "css")
         or has_type(project_types, "django")
-    ):
-        typer.echo(
-            f"1. Merge devDependencies from {pedantry_path}/package.json "
-            f"into your package.json"
-        )
-        typer.echo("2. Run: npm install")
+    )
+
+    if has_frontend_stack:
+        dev_deps = get_dev_dependencies(pedantry_path)
+        if dev_deps:
+            packages_str = " ".join(dev_deps)
+            typer.echo(f"{step_number}. Run: npm install --save-dev {packages_str}")
+        else:
+            typer.echo(
+                f"{step_number}. Review {pedantry_path}/package.json and install "
+                f"the devDependencies"
+            )
+        step_number += 1
 
     if has_type(project_types, "python") or has_type(project_types, "django"):
-        typer.echo("3. Run: uv sync")
+        typer.echo(f"{step_number}. Run: uv sync")
+        step_number += 1
 
-    typer.echo("4. Run: lefthook install")
-    typer.echo("5. Commit the changes:")
+    typer.echo(f"{step_number}. Run: lefthook install")
+    step_number += 1
+    typer.echo(f"{step_number}. Commit the changes:")
     typer.echo(f"   git add .gitmodules {pedantry_path} <symlinked-files> lefthook.yml")
     typer.echo("   git commit -m '➕ Add pedantry config submodule'")
 
