@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Set up pedantry configs in your project via symlinks."""
 
+import shutil
 from pathlib import Path
 from typing import Annotated
 
@@ -23,6 +24,15 @@ def ensure_dir(directory: Path) -> None:
     if not directory.exists():
         directory.mkdir(parents=True)
         typer.secho(f"  ✓ Created directory {directory}", fg=typer.colors.GREEN)
+
+
+def copy_file(source: Path, target: Path) -> None:
+    """Copy a file from source to target."""
+    if target.exists():
+        typer.secho(f"  Skipping {target} (already exists)", fg=typer.colors.YELLOW)
+    else:
+        shutil.copy2(source, target)
+        typer.secho(f"  ✓ Copied {target}", fg=typer.colors.GREEN)
 
 
 def has_type(project_types: list[str], type_name: str) -> bool:
@@ -198,8 +208,8 @@ def main(
     # GitHub Copilot instructions
     typer.echo("\nSetting up GitHub Copilot instructions...")
     ensure_dir(Path(".github"))
-    create_symlink(
-        Path("..") / pedantry_path / ".github" / "copilot-instructions.md",
+    copy_file(
+        pedantry_path / ".github" / "copilot-instructions.md",
         Path(".github") / "copilot-instructions.md",
     )
 
