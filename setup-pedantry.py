@@ -179,6 +179,8 @@ def main(
     # Common configs for all project types
     typer.echo("Setting up common configs...")
     create_symlink(pedantry_path / ".editorconfig", Path(".editorconfig"))
+    create_symlink(pedantry_path / ".prettierrc.json5", Path(".prettierrc.json5"))
+    create_symlink(pedantry_path / ".prettierignore", Path(".prettierignore"))
     generate_lefthook(project_types)
 
     # VS Code settings
@@ -206,8 +208,6 @@ def main(
         typer.echo("\nSetting up JavaScript/TypeScript configs...")
         create_symlink(pedantry_path / "eslint.config.js", Path("eslint.config.js"))
         create_symlink(pedantry_path / "tsconfig.json", Path("tsconfig.json"))
-        create_symlink(pedantry_path / ".prettierrc.json5", Path(".prettierrc.json5"))
-        create_symlink(pedantry_path / ".prettierignore", Path(".prettierignore"))
         create_symlink(pedantry_path / "vitest.config.ts", Path("vitest.config.ts"))
         create_symlink(
             pedantry_path / "web-test-runner.config.js",
@@ -240,10 +240,6 @@ def main(
             project_types, "javascript"
         ):
             create_symlink(pedantry_path / "eslint.config.js", Path("eslint.config.js"))
-            create_symlink(
-                pedantry_path / ".prettierrc.json5", Path(".prettierrc.json5")
-            )
-            create_symlink(pedantry_path / ".prettierignore", Path(".prettierignore"))
 
     typer.secho("\n✓ Pedantry setup complete!\n", fg=typer.colors.GREEN)
 
