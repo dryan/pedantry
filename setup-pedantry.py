@@ -2,6 +2,7 @@
 """Set up pedantry configs in your project via symlinks."""
 
 from pathlib import Path
+from typing import Annotated
 
 import typer
 
@@ -113,7 +114,7 @@ def generate_lefthook(project_types: list[str]) -> None:
 @app.command()
 def main(
     types: Annotated[
-        List[str],
+        list[str],
         typer.Option(
             "--type",
             help="Project type (can be specified multiple times)",
@@ -140,12 +141,18 @@ def main(
     valid_types = {"python", "typescript", "javascript", "css", "django"}
     invalid_types = [t for t in types if t not in valid_types]
     if invalid_types:
-        typer.secho(f"Error: Invalid project type(s): {', '.join(invalid_types)}", fg=typer.colors.RED, err=True)
+        typer.secho(
+            f"Error: Invalid project type(s): {', '.join(invalid_types)}",
+            fg=typer.colors.RED,
+            err=True,
+        )
         typer.echo(f"Valid types: {', '.join(sorted(valid_types))}")
         raise typer.Exit(1)
 
     if not types:
-        typer.secho("Error: At least one --type is required", fg=typer.colors.RED, err=True)
+        typer.secho(
+            "Error: At least one --type is required", fg=typer.colors.RED, err=True
+        )
         raise typer.Exit(1)
 
     project_types = types
@@ -153,14 +160,21 @@ def main(
 
     # Check if pedantry directory exists
     if not pedantry_path.exists():
-        typer.secho(f"Error: Pedantry directory not found: {pedantry_path}", fg=typer.colors.RED, err=True)
+        typer.secho(
+            f"Error: Pedantry directory not found: {pedantry_path}",
+            fg=typer.colors.RED,
+            err=True,
+        )
         typer.echo("Have you added the submodule? Run:")
         typer.echo(
             f"  git submodule add https://github.com/yourusername/pedantry.git {pedantry_path}"
         )
         raise typer.Exit(1)
 
-    typer.secho(f"Setting up pedantry configs for: {', '.join(project_types)}\n", fg=typer.colors.GREEN)
+    typer.secho(
+        f"Setting up pedantry configs for: {', '.join(project_types)}\n",
+        fg=typer.colors.GREEN,
+    )
 
     # Common configs for all project types
     typer.echo("Setting up common configs...")

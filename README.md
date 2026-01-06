@@ -60,17 +60,29 @@ git submodule add https://github.com/yourusername/pedantry.git .pedantry
 **2. Run the setup script:**
 
 ```bash
-# For hybrid Python + TypeScript/JavaScript projects
-.pedantry/setup-pedantry.sh --type hybrid
-
 # For Python-only projects
-.pedantry/setup-pedantry.sh --type python
+uv run --isolated --with typer .pedantry/setup-pedantry.py --type python
 
 # For TypeScript/JavaScript-only projects
-.pedantry/setup-pedantry.sh --type typescript
+uv run --isolated --with typer .pedantry/setup-pedantry.py --type typescript
+
+# For multiple types (e.g., Python + TypeScript)
+uv run --isolated --with typer .pedantry/setup-pedantry.py --type python --type typescript
+
+# For Django projects (includes Python + CSS + JS support)
+uv run --isolated --with typer .pedantry/setup-pedantry.py --type django
+
+# For CSS-only projects
+uv run --isolated --with typer .pedantry/setup-pedantry.py --type css --type javascript
+
+# Custom pedantry directory location
+uv run --isolated --with typer .pedantry/setup-pedantry.py --type python --pedantry-dir ../pedantry
+
+# See help for all options
+uv run --isolated --with typer .pedantry/setup-pedantry.py --help
 ```
 
-The script creates symlinks to all necessary config files.
+The script creates symlinks to all necessary config files and generates a custom `lefthook.yml` based on your project types.
 
 **3. Merge dependencies:**
 
