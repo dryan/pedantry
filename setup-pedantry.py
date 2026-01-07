@@ -74,6 +74,44 @@ def copy_pyproject_with_project_name(source: Path, target: Path) -> None:
     )
 
 
+def create_eslint_config(pedantry_path: Path, target: Path) -> None:
+    """Create a local ESLint config that extends the pedantry config."""
+    if target.exists():
+        typer.secho(f"  Skipping {target} (already exists)", fg=typer.colors.YELLOW)
+        return
+
+    # Calculate relative path from target to pedantry eslint config
+    try:
+        relative_path = pedantry_path.resolve() / "eslint.config.js"
+        cwd = Path.cwd().resolve()
+        # Calculate relative path
+        try:
+            rel_path_str = relative_path.relative_to(cwd).as_posix()
+        except ValueError:
+            # If not relative (different drives on Windows, etc), use absolute
+            rel_path_str = relative_path.as_posix()
+
+        # Ensure it starts with ./ if it's a relative path without ..
+        if not rel_path_str.startswith(".") and not rel_path_str.startswith("/"):
+            rel_path_str = f"./{rel_path_str}"
+    except Exception:
+        # Fallback to a reasonable default
+        rel_path_str = "./node_modules/pedantry/eslint.config.js"
+
+    content = f"""// @ts-check
+
+import pedantryConfig from "{rel_path_str}";
+
+export default [
+  ...pedantryConfig,
+  // Add your project-specific overrides here
+];
+"""
+
+    target.write_text(content)
+    typer.secho(f"  ✓ Created {target}", fg=typer.colors.GREEN)
+
+
 def get_dev_dependencies(pedantry_path: Path) -> list[str]:
     """Return sorted dev dependency names from the pedantry package.json."""
     package_path = pedantry_path / "package.json"
@@ -350,7 +388,7 @@ def main(
     # Type-specific configs
     if has_type(project_types, "typescript") or has_type(project_types, "javascript"):
         typer.echo("\nSetting up JavaScript/TypeScript configs...")
-        create_symlink(pedantry_path / "eslint.config.js", Path("eslint.config.js"))
+        create_eslint_config(pedantry_path, Path("eslint.config.js"))
         create_symlink(pedantry_path / "tsconfig.json", Path("tsconfig.json"))
         create_symlink(pedantry_path / "vitest.config.ts", Path("vitest.config.ts"))
         create_symlink(
@@ -385,7 +423,7 @@ def main(
         if not has_type(project_types, "typescript") and not has_type(
             project_types, "javascript"
         ):
-            create_symlink(pedantry_path / "eslint.config.js", Path("eslint.config.js"))
+            create_eslint_config(pedantry_path, Path("eslint.config.js"))
 
     typer.secho("\n✓ Pedantry setup complete!\n", fg=typer.colors.GREEN)
 
