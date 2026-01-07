@@ -5,6 +5,7 @@ import tseslint from "typescript-eslint";
 import prettierConfig from "eslint-config-prettier";
 import json from "@eslint/json";
 
+/** @type {import('eslint').Linter.Config[]} */
 export default [
   {
     // Global ignores
