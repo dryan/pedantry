@@ -34,14 +34,14 @@ export default [
     ],
   },
 
-  // JavaScript/TypeScript files
+  // Base configs
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  prettierConfig,
+
+  // JavaScript/TypeScript files - custom rules
   {
     files: ["**/*.js", "**/*.ts"],
-    extends: [
-      eslint.configs.recommended,
-      ...tseslint.configs.recommended,
-      prettierConfig,
-    ],
     rules: {
       // Web Components often use property decorators
       "@typescript-eslint/no-unused-vars": [
