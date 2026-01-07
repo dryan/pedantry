@@ -38,7 +38,7 @@
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "*",
     "@eslint/js": "*",
-    "@eslint/json": "*",
+    "@eslint/json": "^0.14.0",
     "@rollup/plugin-commonjs": "*",
     "@rollup/plugin-node-resolve": "*",
     "@rollup/plugin-terser": "*",
@@ -52,6 +52,7 @@
     "@web/test-runner-playwright": "*",
     "eslint": "*",
     "eslint-config-prettier": "*",
+    "jiti": "^2.6.1",
     "lit": "*",
     "prettier": "*",
     "rollup": "*",

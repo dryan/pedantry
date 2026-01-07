@@ -82,7 +82,7 @@ def create_eslint_config(pedantry_path: Path, target: Path) -> None:
 
     # Calculate relative path from target to pedantry eslint config
     try:
-        relative_path = pedantry_path.resolve() / "eslint.config.js"
+        relative_path = pedantry_path.resolve() / "eslint.config.ts"
         cwd = Path.cwd().resolve()
         # Calculate relative path
         try:
@@ -96,16 +96,17 @@ def create_eslint_config(pedantry_path: Path, target: Path) -> None:
             rel_path_str = f"./{rel_path_str}"
     except Exception:
         # Fallback to a reasonable default
-        rel_path_str = "./node_modules/pedantry/eslint.config.js"
+        rel_path_str = "./node_modules/pedantry/eslint.config.ts"
 
-    content = f"""// @ts-check
-
+    content = f"""import type {{ Linter }} from "eslint";
 import pedantryConfig from "{rel_path_str}";
 
-export default [
+const config: Linter.Config[] = [
   ...pedantryConfig,
   // Add your project-specific overrides here
 ];
+
+export default config;
 """
 
     target.write_text(content)
@@ -388,7 +389,7 @@ def main(
     # Type-specific configs
     if has_type(project_types, "typescript") or has_type(project_types, "javascript"):
         typer.echo("\nSetting up JavaScript/TypeScript configs...")
-        create_eslint_config(pedantry_path, Path("eslint.config.js"))
+        create_eslint_config(pedantry_path, Path("eslint.config.ts"))
         create_symlink(pedantry_path / "tsconfig.json", Path("tsconfig.json"))
         create_symlink(pedantry_path / "vitest.config.ts", Path("vitest.config.ts"))
         create_symlink(
@@ -423,7 +424,7 @@ def main(
         if not has_type(project_types, "typescript") and not has_type(
             project_types, "javascript"
         ):
-            create_eslint_config(pedantry_path, Path("eslint.config.js"))
+            create_eslint_config(pedantry_path, Path("eslint.config.ts"))
 
     typer.secho("\n✓ Pedantry setup complete!\n", fg=typer.colors.GREEN)
 

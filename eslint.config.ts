@@ -1,12 +1,10 @@
-// @ts-check
-
+import type { Linter } from "eslint";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import prettierConfig from "eslint-config-prettier";
 import json from "@eslint/json";
 
-/** @type {import('eslint').Linter.Config[]} */
-export default [
+const config: Linter.Config[] = [
   {
     // Global ignores
     ignores: [
@@ -21,6 +19,7 @@ export default [
       "*.js", // Ignore generated JS files
       "!*.config.js", // But don't ignore config files
       "!eslint.config.js",
+      "!eslint.config.ts",
       "!rollup.config.js",
       "!web-test-runner.config.js",
       "!scripts/**/*.js",
@@ -35,10 +34,34 @@ export default [
     ],
   },
 
+  // JSON files
+  {
+    files: ["**/*.json"],
+    ignores: ["**/tsconfig*.json"], // Exclude tsconfig which has comments
+    language: "json/json",
+    ...json.configs.recommended,
+  },
+
+  // JSONC files (JSON with Comments like tsconfig.json)
+  {
+    files: ["**/tsconfig*.json"],
+    language: "json/jsonc",
+    ...json.configs.recommended,
+  },
+
   // Base configs
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  prettierConfig,
+  {
+    ...eslint.configs.recommended,
+    files: ["**/*.{js,ts,jsx,tsx}"],
+  },
+  ...tseslint.configs.recommended.map((config) => ({
+    ...config,
+    files: ["**/*.{js,ts,jsx,tsx}"],
+  })),
+  {
+    ...prettierConfig,
+    files: ["**/*.{js,ts,jsx,tsx}"],
+  },
 
   // JavaScript/TypeScript files - custom rules
   {
@@ -105,11 +128,6 @@ export default [
       },
     },
   },
-
-  // JSON files
-  {
-    files: ["**/*.json"],
-    language: "json/json",
-    ...json.configs.recommended,
-  },
 ];
+
+export default config;
