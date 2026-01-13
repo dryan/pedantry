@@ -74,12 +74,18 @@ addopts = [
     "--showlocals",
 ]
 
-[tool.pyright]
+[tool.ty.environment]
 # Python version
-pythonVersion = "3.14"
+python-version = "3.14"
 
-# Paths
+# Paths - ty will auto-detect src layout if ./src exists
+# root = ["src"]  # Uncomment to override auto-detection
+
+[tool.ty.src]
+# Files to check
 include = ["src"]
+
+# Files to exclude from type checking
 exclude = [
     "**/__pycache__",
     "**/node_modules",
@@ -89,27 +95,18 @@ exclude = [
     "build",
 ]
 
-# Type checking mode
-typeCheckingMode = "standard"  # "off", "basic", "standard", or "strict"
+[tool.ty.rules]
+# ty uses rules instead of individual report settings
+# All rules default to "error" unless specified otherwise
+# Example: possibly-unresolved-reference = "warn"
+# Example: division-by-zero = "ignore"
 
-# Report settings
-reportMissingImports = true
-reportMissingTypeStubs = false
-reportUnusedImport = true
-reportUnusedClass = true
-reportUnusedFunction = true
-reportUnusedVariable = true
-reportDuplicateImport = true
-reportOptionalMemberAccess = true
-reportOptionalSubscript = true
-reportPrivateImportUsage = true
+[tool.ty.terminal]
+# Output format: "full" (default) or "concise"
+output-format = "full"
 
-# Additional strict options (uncomment for stricter checking)
-# reportConstantRedefinition = true
-# reportIncompatibleMethodOverride = true
-# reportIncompatibleVariableOverride = true
-# reportUntypedFunctionDecorator = true
-# reportUntypedClassDecorator = true
+# Treat warnings as errors
+error-on-warning = false
 
 [tool.vulture]
 # Minimum confidence for reporting unused code (0-100)

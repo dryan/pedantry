@@ -283,11 +283,11 @@ Use `pytest`:
 
 **Python Type Checking:**
 
-Use `ty` (Pyright CLI) for static type checking:
+Use `ty` for static type checking (NOTE: `ty` is a separate tool, NOT Pyright itself):
 
 - Run `uv run ty` to type check Python code
 - Use `uv run ty --watch` for continuous checking
-- Configure strictness in `pyproject.toml` under `[tool.pyright]`
+- Configure strictness in `pyproject.toml` under `[tool.pyright]` (ty uses Pyright under the hood)
 - Type checking modes: `basic`, `standard` (default), or `strict`
 - Always add type hints to function signatures and complex variables
 
@@ -296,13 +296,11 @@ Use `ty` (Pyright CLI) for static type checking:
 Use additional tools for code quality:
 
 - **Vulture**: Detect dead/unused code (`uv run vulture src/`)
-
   - Reports functions, classes, variables, imports that are never used
   - Configure `min_confidence` in `pyproject.toml` (default: 80)
   - Useful for finding code that can be safely removed
 
 - **django-upgrade**: Modernize Django code (Django projects only)
-
   - Run `uv run django-upgrade --target-version 5.1 src/**/*.py`
   - Updates deprecated Django patterns to modern equivalents
   - Automatically fixes outdated code
