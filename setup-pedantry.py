@@ -220,8 +220,8 @@ def generate_lefthook(project_types: list[str]) -> None:
       glob: "*.{js,ts,json,css,html,md,yml,yaml}"
       run: |
         for f in {staged_files}; do
-          [ ! -L "$f" ] && npx prettier --write "$f"
-        done || true
+          [ -f "$f" ] && [ ! -L "$f" ] && npx prettier --write "$f"
+        done
       stage_fixed: true
 
 """
@@ -235,7 +235,11 @@ def generate_lefthook(project_types: list[str]) -> None:
         content += """    # Lint JavaScript/TypeScript
     eslint:
       glob: "*.{js,ts,json}"
-      run: npx eslint --fix {staged_files}
+      run: |
+        FILES=$(for f in {staged_files}; do
+          [ -f "$f" ] && echo "$f"
+        done)
+        [ -z "$FILES" ] || npx eslint --fix $FILES
       stage_fixed: true
 
 """
@@ -245,7 +249,11 @@ def generate_lefthook(project_types: list[str]) -> None:
         content += """    # Lint CSS
     stylelint:
       glob: "*.css"
-      run: npx stylelint --fix {staged_files}
+      run: |
+        FILES=$(for f in {staged_files}; do
+          [ -f "$f" ] && echo "$f"
+        done)
+        [ -z "$FILES" ] || npx stylelint --fix $FILES
       stage_fixed: true
 
 """
@@ -255,12 +263,20 @@ def generate_lefthook(project_types: list[str]) -> None:
         content += """    # Format and lint Python (if Python files exist)
     ruff-format:
       glob: "*.py"
-      run: ruff format {staged_files}
+      run: |
+        FILES=$(for f in {staged_files}; do
+          [ -f "$f" ] && echo "$f"
+        done)
+        [ -z "$FILES" ] || ruff format $FILES
       stage_fixed: true
 
     ruff-check:
       glob: "*.py"
-      run: ruff check --fix {staged_files}
+      run: |
+        FILES=$(for f in {staged_files}; do
+          [ -f "$f" ] && echo "$f"
+        done)
+        [ -z "$FILES" ] || ruff check --fix $FILES
       stage_fixed: true
 
 """
@@ -270,20 +286,32 @@ def generate_lefthook(project_types: list[str]) -> None:
         content += """    # Check for dead/unused code in Python
     vulture:
       glob: "*.py"
-      run: uv run vulture {staged_files}
+      run: |
+        FILES=$(for f in {staged_files}; do
+          [ -f "$f" ] && echo "$f"
+        done)
+        [ -z "$FILES" ] || uv run vulture $FILES
       stage_fixed: false # vulture only reports, doesn't fix
 
 """
 
     # Django upgrade - django only
     if has_type(project_types, "django"):
-        content += """    # Upgrade Django code patterns (only for Django projects)
+        content += (
+            """    # Upgrade Django code patterns """
+            """(only for Django projects)
     django-upgrade:
       glob: "*.py"
-      run: uv run django-upgrade --target-version 5.1 {staged_files}
+      run: |
+        FILES=$(for f in {staged_files}; do
+          [ -f "$f" ] && echo "$f"
+        done)
+        [ -z "$FILES" ] || """
+            """uv run django-upgrade --target-version 5.1 $FILES
       stage_fixed: true
 
 """
+        )
 
     Path("lefthook.yml").write_text(content)
     typer.secho("  ✓ Generated lefthook.yml", fg=typer.colors.GREEN)
