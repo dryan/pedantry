@@ -219,9 +219,11 @@ def generate_lefthook(project_types: list[str]) -> None:
     prettier:
       glob: "*.{js,ts,json,css,html,md,yml,yaml}"
       run: |
-        for f in {staged_files}; do
-          [ -f "$f" ] && [ ! -L "$f" ] && npx prettier --write "$f"
-        done
+        FILES=$(for f in {staged_files}; do
+          [ -f "$f" ] && [ ! -L "$f" ] && echo "$f"
+        done)
+        echo "Sending to prettier: $FILES"
+        [ -z "$FILES" ] || npx prettier --write $FILES
       stage_fixed: true
 
 """
