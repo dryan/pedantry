@@ -4,7 +4,12 @@ pre-commit:
     # Format files
     prettier:
       glob: "*.{js,ts,json,css,html,md,yml,yaml}"
-      run: for f in {staged_files}; do [ -f "$f" ] && [ ! -L "$f" ] && npx prettier --write "$f"; done
+      run: |
+        FILES=$(for f in {staged_files}; do
+          [ -f "$f" ] && [ ! -L "$f" ] && echo "$f"
+        done)
+        echo "Sending to prettier: $FILES"
+        [ -z "$FILES" ] || npx prettier --write $FILES
       stage_fixed: true
 
     # Lint JavaScript/TypeScript
