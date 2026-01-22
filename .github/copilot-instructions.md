@@ -233,7 +233,7 @@ test:
 
 # Type check Python code
 typecheck:
-    uv run ty
+    uv run ty check
 
 # Run linters
 lint:
