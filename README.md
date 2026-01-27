@@ -82,7 +82,7 @@ uv run --isolated --with typer .pedantry/setup-pedantry.py --type python --pedan
 uv run --isolated --with typer .pedantry/setup-pedantry.py --help
 ```
 
-The script creates symlinks to all necessary config files and generates a custom `lefthook.yml` based on your project types.
+The script copies all necessary config files to your project and generates a custom `lefthook.yml` based on your project types.
 
 **3. Merge dependencies:**
 
@@ -97,9 +97,11 @@ lefthook install # Set up git hooks
 **4. Commit the setup:**
 
 ```bash
-git add .gitmodules .pedantry <symlinked-files>
+git add .gitmodules .pedantry <config-files>
 git commit -m "➕ Add pedantry config submodule"
 ```
+
+**⚠️ Important: DO NOT modify files in the `.pedantry/` submodule directory.** Always edit the copied config files in your project root. The submodule should remain untouched so you can update it cleanly.
 
 **Updating pedantry:**
 

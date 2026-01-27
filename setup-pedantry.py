@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Set up pedantry configs in your project via symlinks."""
+"""Set up pedantry configs in your project by copying files."""
 
 import json
 import re
@@ -10,16 +10,8 @@ from urllib.request import urlopen
 
 import typer
 
-app = typer.Typer(help="Set up pedantry configs in your project via symlinks.")
+app = typer.Typer(help="Set up pedantry configs in your project by copying files.")
 
-
-def create_symlink(source: Path, target: Path) -> None:
-    """Create a symlink from source to target."""
-    if target.exists() or target.is_symlink():
-        typer.secho(f"  Skipping {target} (already exists)", fg=typer.colors.YELLOW)
-    else:
-        target.symlink_to(source)
-        typer.secho(f"  ✓ Linked {target}", fg=typer.colors.GREEN)
 
 
 def ensure_dir(directory: Path) -> None:
@@ -335,7 +327,7 @@ def main(
         ),
     ] = ".pedantry",
 ) -> None:
-    """Set up pedantry configs in your project via symlinks.
+    """Set up pedantry configs in your project by copying files.
 
     Examples:
 
@@ -390,21 +382,21 @@ def main(
 
     # Common configs for all project types
     typer.echo("Setting up common configs...")
-    create_symlink(pedantry_path / ".editorconfig", Path(".editorconfig"))
-    create_symlink(pedantry_path / ".prettierrc.json5", Path(".prettierrc.json5"))
-    create_symlink(pedantry_path / ".prettierignore", Path(".prettierignore"))
+    copy_file(pedantry_path / ".editorconfig", Path(".editorconfig"))
+    copy_file(pedantry_path / ".prettierrc.json5", Path(".prettierrc.json5"))
+    copy_file(pedantry_path / ".prettierignore", Path(".prettierignore"))
     generate_gitignore(project_types)
     generate_lefthook(project_types)
 
     # VS Code settings
     typer.echo("\nSetting up VS Code configs...")
     ensure_dir(Path(".vscode"))
-    create_symlink(
-        Path("..") / pedantry_path / ".vscode" / "settings.json",
+    copy_file(
+        pedantry_path / ".vscode" / "settings.json",
         Path(".vscode") / "settings.json",
     )
-    create_symlink(
-        Path("..") / pedantry_path / ".vscode" / "extensions.json",
+    copy_file(
+        pedantry_path / ".vscode" / "extensions.json",
         Path(".vscode") / "extensions.json",
     )
 
@@ -420,21 +412,21 @@ def main(
     if has_type(project_types, "typescript") or has_type(project_types, "javascript"):
         typer.echo("\nSetting up JavaScript/TypeScript configs...")
         create_eslint_config(pedantry_path, Path("eslint.config.ts"))
-        create_symlink(pedantry_path / "tsconfig.json", Path("tsconfig.json"))
-        create_symlink(pedantry_path / "vitest.config.ts", Path("vitest.config.ts"))
-        create_symlink(
+        copy_file(pedantry_path / "tsconfig.json", Path("tsconfig.json"))
+        copy_file(pedantry_path / "vitest.config.ts", Path("vitest.config.ts"))
+        copy_file(
             pedantry_path / "web-test-runner.config.js",
             Path("web-test-runner.config.js"),
         )
-        create_symlink(pedantry_path / "rollup.config.js", Path("rollup.config.js"))
-        create_symlink(
+        copy_file(pedantry_path / "rollup.config.js", Path("rollup.config.js"))
+        copy_file(
             pedantry_path / "custom-elements-manifest.config.js",
             Path("custom-elements-manifest.config.js"),
         )
 
     if has_type(project_types, "css"):
         typer.echo("\nSetting up CSS configs...")
-        create_symlink(
+        copy_file(
             pedantry_path / "stylelint.config.mjs", Path("stylelint.config.mjs")
         )
 
@@ -448,7 +440,7 @@ def main(
         typer.echo("\nSetting up Django configs...")
         # Django-specific CSS/JS if not already set up
         if not has_type(project_types, "css"):
-            create_symlink(
+            copy_file(
                 pedantry_path / "stylelint.config.mjs", Path("stylelint.config.mjs")
             )
         if not has_type(project_types, "typescript") and not has_type(
@@ -488,7 +480,7 @@ def main(
     typer.echo(f"{step_number}. Run: lefthook install")
     step_number += 1
     typer.echo(f"{step_number}. Commit the changes:")
-    typer.echo(f"   git add .gitmodules {pedantry_path} <symlinked-files> lefthook.yml")
+    typer.echo(f"   git add .gitmodules {pedantry_path} <config-files> lefthook.yml")
     typer.echo("   git commit -m '➕ Add pedantry config submodule'")
 
     typer.secho("\nTo update pedantry later:", fg=typer.colors.YELLOW)

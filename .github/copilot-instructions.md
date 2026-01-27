@@ -4,6 +4,21 @@ This document provides guidelines for AI assistants working on this codebase.
 
 ---
 
+## ⚠️ CRITICAL: Do Not Modify Submodule Files
+
+**If this project uses the pedantry submodule (`.pedantry/` directory), NEVER modify files within it.**
+
+- All configuration files have been **copied** from the submodule to the project root
+- Edit the copied files in the project root, NOT the originals in `.pedantry/`
+- The submodule should remain unchanged so it can be updated cleanly
+- Modifying submodule files will cause merge conflicts during updates
+
+**When editing configs:**
+- ✅ Edit files at project root: `tsconfig.json`, `eslint.config.ts`, `pyproject.toml`, etc.
+- ❌ Never edit: `.pedantry/tsconfig.json`, `.pedantry/eslint.config.ts`, etc.
+
+---
+
 ## Core Principle: Always Ask First
 
 **Default to asking about preferences rather than choosing automatically.** When there are multiple valid approaches or unclear requirements, always ask the user for guidance before proceeding.
