@@ -3,6 +3,7 @@ import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import prettierConfig from "eslint-config-prettier";
 import json from "@eslint/json";
+import globals from "globals";
 
 const config: Linter.Config[] = [
   {
@@ -84,13 +85,7 @@ const config: Linter.Config[] = [
   {
     files: ["*.config.js", "*.config.ts", "scripts/**/*.js", "scripts/**/*.ts"],
     languageOptions: {
-      globals: {
-        process: "readonly",
-        console: "readonly",
-        __dirname: "readonly",
-        __filename: "readonly",
-        Buffer: "readonly",
-      },
+      globals: globals.node,
     },
   },
 
@@ -98,16 +93,7 @@ const config: Linter.Config[] = [
   {
     files: ["src/**/*.js", "src/**/*.ts"],
     languageOptions: {
-      globals: {
-        window: "readonly",
-        document: "readonly",
-        customElements: "readonly",
-        HTMLElement: "readonly",
-        CustomEvent: "readonly",
-        Element: "readonly",
-        Event: "readonly",
-        EventTarget: "readonly",
-      },
+      globals: globals.browser,
     },
   },
 
@@ -115,17 +101,7 @@ const config: Linter.Config[] = [
   {
     files: ["**/*.test.js", "**/*.test.ts", "**/*.spec.js", "**/*.spec.ts"],
     languageOptions: {
-      globals: {
-        describe: "readonly",
-        it: "readonly",
-        expect: "readonly",
-        beforeEach: "readonly",
-        afterEach: "readonly",
-        beforeAll: "readonly",
-        afterAll: "readonly",
-        jest: "readonly",
-        test: "readonly",
-      },
+      globals: globals.jest,
     },
   },
 ];
