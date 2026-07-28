@@ -13,7 +13,6 @@ import typer
 app = typer.Typer(help="Set up pedantry configs in your project by copying files.")
 
 
-
 def ensure_dir(directory: Path) -> None:
     """Create directory if it doesn't exist."""
     if not directory.exists():
@@ -400,13 +399,10 @@ def main(
         Path(".vscode") / "extensions.json",
     )
 
-    # GitHub Copilot instructions
-    typer.echo("\nSetting up GitHub Copilot instructions...")
-    ensure_dir(Path(".github"))
-    copy_file(
-        pedantry_path / ".github" / "copilot-instructions.md",
-        Path(".github") / "copilot-instructions.md",
-    )
+    # AI agent instructions
+    typer.echo("\nSetting up AI agent instructions...")
+    copy_file(pedantry_path / "AGENTS.md", Path("AGENTS.md"))
+    copy_file(pedantry_path / "CLAUDE.md", Path("CLAUDE.md"))
 
     # Type-specific configs
     if has_type(project_types, "typescript") or has_type(project_types, "javascript"):
@@ -426,9 +422,7 @@ def main(
 
     if has_type(project_types, "css"):
         typer.echo("\nSetting up CSS configs...")
-        copy_file(
-            pedantry_path / "stylelint.config.mjs", Path("stylelint.config.mjs")
-        )
+        copy_file(pedantry_path / "stylelint.config.mjs", Path("stylelint.config.mjs"))
 
     if has_type(project_types, "python") or has_type(project_types, "django"):
         typer.echo("\nSetting up Python configs...")

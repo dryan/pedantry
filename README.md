@@ -139,8 +139,8 @@ cp rollup.config.js vitest.config.ts web-test-runner.config.js custom-elements-m
 # VS Code settings
 cp -r .vscode <your-project>/
 
-# Copilot instructions
-cp -r .github <your-project>/
+# AI agent instructions (AGENTS.md + CLAUDE.md shim)
+cp AGENTS.md CLAUDE.md <your-project>/
 ```
 
 Then install dependencies:

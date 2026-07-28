@@ -1,4 +1,4 @@
-# GitHub Copilot Instructions
+# Agent Instructions
 
 This document provides guidelines for AI assistants working on this codebase.
 
@@ -545,13 +545,6 @@ Before adding new dependencies:
 - Prefer list comprehensions and generators
 - Use dataclasses or Pydantic for structured data
 - Import types from `typing` when needed (e.g., `List`, `Dict`, `Optional`, `Union`)
-
-- Follow PEP 8 style guide
-- Use type hints (Python 3.11+ syntax)
-- Write docstrings for functions and classes (Google or NumPy style)
-- Use context managers for resource management
-- Prefer list comprehensions and generators
-- Use dataclasses or Pydantic for structured data
 
 ### HTML
 
