@@ -14,6 +14,7 @@ This document provides guidelines for AI assistants working on this codebase.
 - Modifying submodule files will cause merge conflicts during updates
 
 **When editing configs:**
+
 - ✅ Edit files at project root: `tsconfig.json`, `eslint.config.ts`, `pyproject.toml`, etc.
 - ❌ Never edit: `.pedantry/tsconfig.json`, `.pedantry/eslint.config.ts`, etc.
 
