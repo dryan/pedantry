@@ -35,10 +35,6 @@
   ],
   "author": "",
   "license": "ISC",
-  "overrides": {
-    "serialize-javascript": ">=7.0.3",
-    "koa": ">=2.16.4"
-  },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "*",
     "@eslint/js": "*",
