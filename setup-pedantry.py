@@ -73,7 +73,10 @@ def create_eslint_config(pedantry_path: Path, target: Path) -> None:
 
     # Calculate relative path from target to pedantry eslint config
     try:
-        relative_path = pedantry_path.resolve() / "eslint.config.ts"
+        # No .ts extension: tsc rejects extensioned imports without
+        # allowImportingTsExtensions, but jiti (eslint's config loader)
+        # resolves the extensionless path fine.
+        relative_path = pedantry_path.resolve() / "eslint.config"
         cwd = Path.cwd().resolve()
         # Calculate relative path
         try:
@@ -83,11 +86,15 @@ def create_eslint_config(pedantry_path: Path, target: Path) -> None:
             rel_path_str = relative_path.as_posix()
 
         # Ensure it starts with ./ if it's a relative path without ..
-        if not rel_path_str.startswith(".") and not rel_path_str.startswith("/"):
+        if (
+            not rel_path_str.startswith("./")
+            and not rel_path_str.startswith("../")
+            and not rel_path_str.startswith("/")
+        ):
             rel_path_str = f"./{rel_path_str}"
     except Exception:
         # Fallback to a reasonable default
-        rel_path_str = "./node_modules/pedantry/eslint.config.ts"
+        rel_path_str = "./node_modules/pedantry/eslint.config"
 
     content = f"""import type {{ Linter }} from "eslint";
 import pedantryConfig from "{rel_path_str}";
@@ -260,7 +267,7 @@ def generate_lefthook(project_types: list[str]) -> None:
         FILES=$(for f in {staged_files}; do
           [ -f "$f" ] && echo "$f"
         done)
-        [ -z "$FILES" ] || ruff format $FILES
+        [ -z "$FILES" ] || uv run ruff format $FILES
       stage_fixed: true
 
     ruff-check:
@@ -269,7 +276,7 @@ def generate_lefthook(project_types: list[str]) -> None:
         FILES=$(for f in {staged_files}; do
           [ -f "$f" ] && echo "$f"
         done)
-        [ -z "$FILES" ] || ruff check --fix $FILES
+        [ -z "$FILES" ] || uv run ruff check --fix $FILES
       stage_fixed: true
 
 """

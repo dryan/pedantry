@@ -27,12 +27,12 @@ pre-commit:
     # Format and lint Python (if Python files exist)
     ruff-format:
       glob: "*.py"
-      run: FILES=$(for f in {staged_files}; do [ -f "$f" ] && echo "$f"; done); [ -z "$FILES" ] || ruff format $FILES
+      run: FILES=$(for f in {staged_files}; do [ -f "$f" ] && echo "$f"; done); [ -z "$FILES" ] || uv run ruff format $FILES
       stage_fixed: true
 
     ruff-check:
       glob: "*.py"
-      run: FILES=$(for f in {staged_files}; do [ -f "$f" ] && echo "$f"; done); [ -z "$FILES" ] || ruff check --fix $FILES
+      run: FILES=$(for f in {staged_files}; do [ -f "$f" ] && echo "$f"; done); [ -z "$FILES" ] || uv run ruff check --fix $FILES
       stage_fixed: true
 
     # Check for dead/unused code in Python
