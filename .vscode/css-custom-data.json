@@ -1,0 +1,33 @@
+{
+  "version": 1.1,
+  "pseudoClasses": [
+    {
+      "name": ":host",
+      "description": "Selects the shadow host of the shadow DOM containing the CSS"
+    },
+    {
+      "name": ":host()",
+      "description": "Selects the shadow host of the shadow DOM containing the CSS, but only if the selector given as the function's parameter matches the shadow host"
+    },
+    {
+      "name": ":host-context()",
+      "description": "Selects the shadow host of the shadow DOM containing the CSS, but only if the selector given as the function's parameter matches an ancestor of the shadow host"
+    }
+  ],
+  "pseudoElements": [
+    {
+      "name": "::slotted",
+      "description": "Represents any element that has been placed into a slot inside an HTML template"
+    },
+    {
+      "name": "::part",
+      "description": "Represents any element within a shadow tree that has a matching part attribute"
+    }
+  ],
+  "atDirectives": [
+    {
+      "name": "@property",
+      "description": "Registers a custom CSS property"
+    }
+  ]
+}
